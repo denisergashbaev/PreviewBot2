@@ -1,0 +1,9 @@
+Quick overview of the available scripts
+
+1) source ./init.sh -- sets PREVIEWBOT_HOME in .bashrc. This needs to be done only once
+2) source ./activate-virtualenv.sh -- well, activates it
+3) sudo ./install-requirements.sh
+4) sudo ./deploy.sh -- to be done only on the server
+
+Internally, some of the scrips call check_init.sh to see if the environment variable is set
+

@@ -1,0 +1,11 @@
+[Unit]
+Description=The Preview Bot
+
+[Service]
+WorkingDirectory=/home/foo/PreviewBot
+ExecStart=/home/foo/PreviewBot/venv/bin/python run.py >> /var/log/preview-bot.log 2>&1
+Restart=on-failure
+User=foo
+
+[Install]
+WantedBy=multi-user.target

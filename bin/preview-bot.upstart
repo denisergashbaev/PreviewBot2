@@ -1,0 +1,19 @@
+description "PreviewBot"
+
+env PYTHON_HOME=/home/foo/PreviewBot/venv
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+respawn limit 10 5
+
+setuid foo
+
+script
+  exec $PYTHON_HOME/bin/python /home/foo/PreviewBot/run.py >> /var/log/preview-bot.log 2>&1
+end script
+
+post-start script
+  echo "PreviewBot started"
+end script

@@ -1,0 +1,2 @@
+liquibase-3.5.3-bin.tar.gz > liquibase
+sqlite-jdbc-3.14.2.1.jar > liquibase/lib

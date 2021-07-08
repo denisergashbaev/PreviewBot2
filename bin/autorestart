@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "$(date +'%Y-%m-%d %H:%M:%S') starting"
+# try curling
+result=$(curl -k https://previewbot.progre55.com/ping)
+
+if [[ $result != "pong" ]]; then
+  # is it failing? restart docker
+  echo "restarting"
+  docker restart preview-bot
+else
+  echo "all good for now"
+fi

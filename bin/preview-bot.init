@@ -1,0 +1,127 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          preview-bot
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start preview-bot at boot time
+# Description:       preview-bot start and stop script.
+### END INIT INFO
+
+set -e
+# This script can start and stop the process that you want to run
+# set -u
+
+usage() {
+  echo "Usage: `basename $0` {start|stop|restart|force-stop|force-restart|status}" >&2
+}
+
+# At least the command is required
+if [ -z "$1" ]; then
+  usage
+  exit 2
+fi
+
+# Make sure the user it set, if not, try the current user, otherwise, fail if current user = root
+[[ -z $PREVIEWBOT_USER ]] && PREVIEWBOT_USER=$(whomai) || true
+[[ "$PREVIEWBOT_USER" == root ]] && echo "Make sure you set PREVIEWBOT_USER first, and you cannot run as root" && exit 1 || true
+# too hackish :)
+[[ -z $PREVIEWBOT_HOME ]] && PREVIEWBOT_HOME=$(grep 'PREVIEWBOT_HOME=' /home/$PREVIEWBOT_USER/.bashrc | awk -F'=' '{print $2}') || true
+PYTHONPATH="$PREVIEWBOT_HOME/venv/bin/python"
+EXECUTABLE="$PREVIEWBOT_HOME/run.py"
+
+# This will get the PID of the application if it is running
+get_pid() {
+  echo `ps ax | grep $EXECUTABLE | grep -v grep | awk '{print $1}' | tr -d ' '`
+}
+
+# Echo the PID of the application to the GLOBAL variable PID
+# Echoes the status of the application
+status() {
+  PID=$(get_pid)
+  if [ -z $PID ]; then
+    echo "Application STOPPED"
+    exit 2
+    # Exits with 1 so that scripts can check status and depnding on the exist status determine of it works or not.
+  else
+    echo "Application RUNNING with PID $PID"
+    exit 0
+  fi
+}
+
+wait_for_application_stop() {
+  while [ $(get_pid) ]; do
+    echo "Waiting for application to stop"
+    sleep 2
+  done
+}
+
+start_application() {
+  if [ `whoami` == $PREVIEWBOT_USER ]; then
+    $PYTHONPATH $EXECUTABLE &
+  else
+    # Run script as intended user
+    su -l $PREVIEWBOT_USER -c "$PYTHONPATH $EXECUTABLE &"
+  fi
+
+  # Sleep for X seconds then check the status of the running application to make sure that it is still running
+  sleep 3
+  status
+}
+
+start() {
+  PID=$(get_pid)
+  echo "Starting application"
+
+  if [ -z $PID ]; then
+    start_application
+    echo "Application started"
+  else
+    echo "Application already RUNNING!"
+  fi
+}
+
+stop() {
+  PID=$(get_pid)
+  echo "Stopping application"
+
+  if [ -z $PID ]; then
+    echo "Application is not running"
+  else
+    if [[ -z $1 ]]; then
+      kill $PID
+    else
+      kill $1 $PID
+    fi
+
+  wait_for_application_stop
+  fi
+}
+
+case "$1" in
+  start)
+    start;
+    ;;
+  restart)
+    stop -TERM; start;
+    ;;
+  stop)
+    stop -TERM
+    ;;
+  force-stop)
+    stop -9
+    ;;
+  force-restart)
+    stop -9; start;
+    ;;
+  status)
+    status
+    ;;
+  *)
+  usage
+  exit 4
+  ;;
+esac
+
+echo "Done"
