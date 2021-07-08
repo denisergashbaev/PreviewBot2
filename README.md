@@ -1,6 +1,6 @@
 # PreviewBot
 
-Together with [desmonduz](desmonduz) and [progre55](https://github.com/progre55) created a rather successfull (at the time, ~30-50 users a day) Telegram bot -- [PreviewBot](https://github.com/denisergashbaev/PreviewBot2) -- that reduced the size of the forwarded videos to save internet traffic for users in countries where mobile internet was expensive.
+Together with [desmonduz](https://github.com/desmonduz) and [progre55](https://github.com/progre55) created a rather successfull (at the time, ~30-50 users a day) Telegram bot -- [PreviewBot](https://github.com/denisergashbaev/PreviewBot2) -- that reduced the size of the forwarded videos to save internet traffic for users in countries where mobile internet was expensive.
 
 This is a code copy (removed sensitive information) of the original PreviewBot for Telegram that was operational in the year of 2018. Here is how it looked like in operation:
 
